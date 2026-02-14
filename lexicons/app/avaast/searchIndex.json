@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.searchIndex",
+  "id": "app.avaast.searchIndex",
   "description": "A search index record that defines full-text and structured search over AT Protocol collection data.",
   "defs": {
     "main": {
@@ -21,7 +21,7 @@
           },
           "source": {
             "type": "ref",
-            "ref": "dev.avaas.defs#source"
+            "ref": "app.avaast.defs#source"
           },
           "fields": {
             "type": "array",
@@ -41,7 +41,7 @@
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#outputField"
+              "ref": "app.avaast.defs#outputField"
             }
           },
           "createdAt": {

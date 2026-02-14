@@ -67,7 +67,7 @@ docker compose up -d pds jetstream
 # 3. Build all packages
 pnpm build
 
-# 4. Start AVaaSt (after setting AVAAS_WATCH_DID in .env)
+# 4. Start AVaaSt (after setting AVAAST_WATCH_DID in .env)
 pnpm --filter @avaast/cli start
 ```
 
@@ -82,15 +82,18 @@ Environment variables override file values.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `AVAAS_WATCH_DID` | Yes | — | DID of the account whose `app.avaast.*` records to watch |
-| `AVAAS_PDS_ENDPOINT` | No | auto-resolved | PDS endpoint URL (resolved from DID if omitted) |
-| `AVAAS_WATCH_RKEY` | No | `self` | Record key for the appView record |
-| `AVAAS_PORT` | No | `3000` | Gateway HTTP port |
-| `AVAAS_CONTROLLER_PORT` | No | `3001` | Controller HTTP port |
-| `AVAAS_HOSTNAME` | No | — | Custom hostname for the app view |
-| `AVAAS_MAX_PROCESSES` | No | `4` | Max concurrent function sandbox processes (1–32) |
-| `AVAAS_FUNCTION_TIMEOUT` | No | `30000` | Function execution timeout in ms (100–30000) |
-| `AVAAS_FUNCTION_MEMORY` | No | `128` | Function memory limit in MB (64–1024) |
+| `AVAAST_WATCH_DID` | Yes | — | DID of the account whose `app.avaast.*` records to watch |
+| `AVAAST_PDS_ENDPOINT` | No | auto-resolved | PDS endpoint URL (resolved from DID if omitted) |
+| `AVAAST_WATCH_RKEY` | No | `self` | Record key for the appView record |
+| `AVAAST_PORT` | No | `3000` | Gateway HTTP port |
+| `AVAAST_CONTROLLER_PORT` | No | `3001` | Controller HTTP port |
+| `AVAAST_HOSTNAME` | No | — | Custom hostname for the app view |
+| `AVAAST_NODE_ID` | No | — | Node ID for this controller instance (enables heartbeat) |
+| `AVAAST_APP_PASSWORD` | No | — | App password for writing heartbeat records to PDS |
+| `AVAAST_HEARTBEAT_INTERVAL_MS` | No | `30000` | Heartbeat interval in milliseconds |
+| `AVAAST_MAX_PROCESSES` | No | `4` | Max concurrent function sandbox processes (1–32) |
+| `AVAAST_FUNCTION_TIMEOUT` | No | `30000` | Function execution timeout in ms (100–30000) |
+| `AVAAST_FUNCTION_MEMORY` | No | `128` | Function memory limit in MB (64–1024) |
 
 ### Local PDS Variables (for Docker Compose dev setup)
 
@@ -284,13 +287,14 @@ AVaaSt defines its own lexicons under the `app.avaast.*` namespace:
 
 | Lexicon | File | Description |
 |---------|------|-------------|
-| `app.avaast.defs` | `lexicons/dev/avaas/defs.json` | Shared type definitions (expressions, queries, schemas) |
-| `app.avaast.computed` | `lexicons/dev/avaas/computed.json` | Computed view records |
-| `app.avaast.function` | `lexicons/dev/avaas/function.json` | Serverless function records |
-| `app.avaast.searchIndex` | `lexicons/dev/avaas/searchIndex.json` | Search index definitions |
-| `app.avaast.subscription` | `lexicons/dev/avaas/subscription.json` | Subscription definitions |
-| `app.avaast.deploy` | `lexicons/dev/avaas/deploy.json` | Deploy bundles |
-| `app.avaast.appView` | `lexicons/dev/avaas/appView.json` | App view service records |
+| `app.avaast.defs` | `lexicons/app/avaast/defs.json` | Shared type definitions (expressions, queries, schemas) |
+| `app.avaast.computed` | `lexicons/app/avaast/computed.json` | Computed view records |
+| `app.avaast.function` | `lexicons/app/avaast/function.json` | Serverless function records |
+| `app.avaast.searchIndex` | `lexicons/app/avaast/searchIndex.json` | Search index definitions |
+| `app.avaast.subscription` | `lexicons/app/avaast/subscription.json` | Subscription definitions |
+| `app.avaast.deploy` | `lexicons/app/avaast/deploy.json` | Deploy bundles |
+| `app.avaast.appView` | `lexicons/app/avaast/appView.json` | App view service records |
+| `app.avaast.status` | `lexicons/app/avaast/status.json` | Heartbeat/status records |
 
 App-specific lexicons (like `chat.pirate.avast` and `chat.pirate.aye`) live alongside
 the AVaaSt lexicons in the `lexicons/` directory.

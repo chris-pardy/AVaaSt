@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.appView",
+  "id": "app.avaast.appView",
   "description": "An app view record that represents a running service endpoint with traffic routing across deployments.",
   "defs": {
     "main": {
@@ -27,7 +27,7 @@
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#trafficRule"
+              "ref": "app.avaast.defs#trafficRule"
             }
           },
           "status": {

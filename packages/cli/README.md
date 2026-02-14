@@ -84,7 +84,7 @@ resolved settings or error messages.
 The CLI loads configuration from three sources (later sources override earlier):
 
 1. **Config file** — `avaast.json` in the working directory, or the path given with `-c`
-2. **Environment variables** — `AVAAS_WATCH_DID`, `AVAAS_PDS_ENDPOINT`, `AVAAS_PORT`, etc.
+2. **Environment variables** — `AVAAST_WATCH_DID`, `AVAAST_PDS_ENDPOINT`, `AVAAST_PORT`, etc.
 3. **Zod validation** — applies defaults and validates constraints
 
 See the [root README](../../README.md#configuration) for the full variable reference.

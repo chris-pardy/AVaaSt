@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.function",
+  "id": "app.avaast.function",
   "description": "A serverless function record that runs user-supplied code with declared inputs, outputs, and dependencies.",
   "defs": {
     "main": {
@@ -37,21 +37,21 @@
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#namedFieldSchema"
+              "ref": "app.avaast.defs#namedFieldSchema"
             }
           },
           "outputSchema": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#namedFieldSchema"
+              "ref": "app.avaast.defs#namedFieldSchema"
             }
           },
           "dependencies": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#dependency"
+              "ref": "app.avaast.defs#dependency"
             }
           },
           "runtime": {

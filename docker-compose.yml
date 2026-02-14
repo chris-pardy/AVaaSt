@@ -55,7 +55,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - AVAAS_CONTROLLER_URL=http://controller:3001
+      - AVAAST_CONTROLLER_URL=http://controller:3001
     depends_on:
       - controller
 
@@ -66,11 +66,11 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - AVAAS_WATCH_DID=${AVAAS_WATCH_DID}
-      - AVAAS_PDS_ENDPOINT=http://pds:2583
-      - AVAAS_JETSTREAM_URL=ws://jetstream:6008/subscribe
+      - AVAAST_WATCH_DID=${AVAAST_WATCH_DID}
+      - AVAAST_PDS_ENDPOINT=http://pds:2583
+      - AVAAST_JETSTREAM_URL=ws://jetstream:6008/subscribe
     volumes:
-      - avaas-data:/data
+      - avaast-data:/data
     depends_on:
       - deno-runtime
       - pds
@@ -79,10 +79,10 @@ services:
   deno-runtime:
     image: denoland/deno:latest
     volumes:
-      - avaas-functions:/functions
+      - avaast-functions:/functions
 
 volumes:
-  avaas-data:
-  avaas-functions:
+  avaast-data:
+  avaast-functions:
   pds-data:
   jetstream-data:

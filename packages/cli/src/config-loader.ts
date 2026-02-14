@@ -21,52 +21,64 @@ export function loadConfig(configPath?: string): Config {
   }
 
   // 2. Build nested structure, applying env var overrides
-  const avaas = (raw.avaas ?? {}) as Record<string, unknown>;
+  const avaast = (raw.avaast ?? {}) as Record<string, unknown>;
   const server = (raw.server ?? {}) as Record<string, unknown>;
   const execution = (raw.execution ?? {}) as Record<string, unknown>;
 
-  // AVAAS_WATCH_DID -> avaas.watchDid
-  if (process.env.AVAAS_WATCH_DID) {
-    avaas.watchDid = process.env.AVAAS_WATCH_DID;
+  // AVAAST_WATCH_DID -> avaast.watchDid
+  if (process.env.AVAAST_WATCH_DID) {
+    avaast.watchDid = process.env.AVAAST_WATCH_DID;
   }
-  // AVAAS_WATCH_RKEY -> avaas.watchRkey (default "self")
-  if (process.env.AVAAS_WATCH_RKEY) {
-    avaas.watchRkey = process.env.AVAAS_WATCH_RKEY;
+  // AVAAST_WATCH_RKEY -> avaast.watchRkey (default "self")
+  if (process.env.AVAAST_WATCH_RKEY) {
+    avaast.watchRkey = process.env.AVAAST_WATCH_RKEY;
   }
-  // AVAAS_PDS_ENDPOINT -> avaas.pdsEndpoint
-  if (process.env.AVAAS_PDS_ENDPOINT) {
-    avaas.pdsEndpoint = process.env.AVAAS_PDS_ENDPOINT;
+  // AVAAST_PDS_ENDPOINT -> avaast.pdsEndpoint
+  if (process.env.AVAAST_PDS_ENDPOINT) {
+    avaast.pdsEndpoint = process.env.AVAAST_PDS_ENDPOINT;
+  }
+  // AVAAST_NODE_ID -> avaast.nodeId
+  if (process.env.AVAAST_NODE_ID) {
+    avaast.nodeId = process.env.AVAAST_NODE_ID;
+  }
+  // AVAAST_APP_PASSWORD -> avaast.appPassword
+  if (process.env.AVAAST_APP_PASSWORD) {
+    avaast.appPassword = process.env.AVAAST_APP_PASSWORD;
+  }
+  // AVAAST_HEARTBEAT_INTERVAL_MS -> avaast.heartbeatIntervalMs
+  if (process.env.AVAAST_HEARTBEAT_INTERVAL_MS) {
+    avaast.heartbeatIntervalMs = parseInt(process.env.AVAAST_HEARTBEAT_INTERVAL_MS, 10);
   }
 
-  // AVAAS_PORT -> server.port
-  if (process.env.AVAAS_PORT) {
-    server.port = parseInt(process.env.AVAAS_PORT, 10);
+  // AVAAST_PORT -> server.port
+  if (process.env.AVAAST_PORT) {
+    server.port = parseInt(process.env.AVAAST_PORT, 10);
   }
-  // AVAAS_CONTROLLER_PORT -> server.controllerPort
-  if (process.env.AVAAS_CONTROLLER_PORT) {
-    server.controllerPort = parseInt(process.env.AVAAS_CONTROLLER_PORT, 10);
+  // AVAAST_CONTROLLER_PORT -> server.controllerPort
+  if (process.env.AVAAST_CONTROLLER_PORT) {
+    server.controllerPort = parseInt(process.env.AVAAST_CONTROLLER_PORT, 10);
   }
-  // AVAAS_HOSTNAME -> server.hostname
-  if (process.env.AVAAS_HOSTNAME) {
-    server.hostname = process.env.AVAAS_HOSTNAME;
+  // AVAAST_HOSTNAME -> server.hostname
+  if (process.env.AVAAST_HOSTNAME) {
+    server.hostname = process.env.AVAAST_HOSTNAME;
   }
 
-  // AVAAS_MAX_PROCESSES -> execution.maxFunctionProcesses
-  if (process.env.AVAAS_MAX_PROCESSES) {
-    execution.maxFunctionProcesses = parseInt(process.env.AVAAS_MAX_PROCESSES, 10);
+  // AVAAST_MAX_PROCESSES -> execution.maxFunctionProcesses
+  if (process.env.AVAAST_MAX_PROCESSES) {
+    execution.maxFunctionProcesses = parseInt(process.env.AVAAST_MAX_PROCESSES, 10);
   }
-  // AVAAS_FUNCTION_TIMEOUT -> execution.functionTimeout
-  if (process.env.AVAAS_FUNCTION_TIMEOUT) {
-    execution.functionTimeout = parseInt(process.env.AVAAS_FUNCTION_TIMEOUT, 10);
+  // AVAAST_FUNCTION_TIMEOUT -> execution.functionTimeout
+  if (process.env.AVAAST_FUNCTION_TIMEOUT) {
+    execution.functionTimeout = parseInt(process.env.AVAAST_FUNCTION_TIMEOUT, 10);
   }
-  // AVAAS_FUNCTION_MEMORY -> execution.functionMemoryLimit
-  if (process.env.AVAAS_FUNCTION_MEMORY) {
-    execution.functionMemoryLimit = parseInt(process.env.AVAAS_FUNCTION_MEMORY, 10);
+  // AVAAST_FUNCTION_MEMORY -> execution.functionMemoryLimit
+  if (process.env.AVAAST_FUNCTION_MEMORY) {
+    execution.functionMemoryLimit = parseInt(process.env.AVAAST_FUNCTION_MEMORY, 10);
   }
 
   // 3. Validate with parseConfig (zod) and return typed Config
   return parseConfig({
-    avaas,
+    avaast,
     server,
     execution,
   });

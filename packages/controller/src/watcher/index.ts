@@ -12,13 +12,14 @@ import { CursorStore } from "./cursor-store.js";
 export { FirehoseClient, Poller, PdsResolver, CursorStore, JetstreamClient };
 export type { FirehoseEvent, FirehoseEventHandler };
 
-const AVAAS_COLLECTIONS = [
-  "dev.avaas.computed",
-  "dev.avaas.function",
-  "dev.avaas.searchIndex",
-  "dev.avaas.subscription",
-  "dev.avaas.deploy",
-  "dev.avaas.appView",
+const AVAAST_COLLECTIONS = [
+  "app.avaast.computed",
+  "app.avaast.function",
+  "app.avaast.searchIndex",
+  "app.avaast.subscription",
+  "app.avaast.deploy",
+  "app.avaast.appView",
+  "app.avaast.status",
 ];
 
 export interface WatcherOptions {
@@ -31,7 +32,7 @@ export interface WatcherOptions {
   onError?: (error: Error) => void;
   /** Jetstream WebSocket URL. When set, Jetstream is used instead of firehose/poller. */
   jetstreamUrl?: string;
-  /** Extra collections to subscribe to via Jetstream (merged with AVAAS_COLLECTIONS). */
+  /** Extra collections to subscribe to via Jetstream (merged with AVAAST_COLLECTIONS). */
   extraCollections?: string[];
 }
 
@@ -100,7 +101,7 @@ export class Watcher {
 
   private startJetstream(): void {
     const allCollections = [
-      ...AVAAS_COLLECTIONS,
+      ...AVAAST_COLLECTIONS,
       ...(this.options.extraCollections ?? []),
     ];
     this.logger.info(
@@ -128,7 +129,7 @@ export class Watcher {
     this.firehose = new FirehoseClient({
       pdsEndpoint: this.options.pdsEndpoint,
       cursor,
-      collections: AVAAS_COLLECTIONS,
+      collections: AVAAST_COLLECTIONS,
       onEvent: (event) => {
         if (event.did === this.options.watchDid) {
           this.options.onEvent(event);
@@ -151,7 +152,7 @@ export class Watcher {
     this.poller = new Poller({
       pdsEndpoint: this.options.pdsEndpoint,
       did: this.options.watchDid,
-      collections: AVAAS_COLLECTIONS,
+      collections: AVAAST_COLLECTIONS,
       intervalMs: this.options.pollIntervalMs ?? 30000,
       onEvent: this.options.onEvent,
       onError: this.options.onError,

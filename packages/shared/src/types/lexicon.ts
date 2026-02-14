@@ -262,3 +262,12 @@ export interface AppViewRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface StatusRecord {
+  nodeId: string;
+  nextHeartbeatAt: string;
+  startedAt?: string;
+  version?: string;
+  appViewCids?: string[];
+  createdAt: string;
+}

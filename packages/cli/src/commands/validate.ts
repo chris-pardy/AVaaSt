@@ -6,9 +6,9 @@ export function validateCommand(configPath?: string): void {
     console.log('Configuration is valid!');
     console.log('');
     console.log('Settings:');
-    console.log(`  Watch DID:        ${config.avaas.watchDid}`);
-    console.log(`  Watch rkey:       ${config.avaas.watchRkey}`);
-    console.log(`  PDS endpoint:     ${config.avaas.pdsEndpoint ?? '(auto-resolve)'}`);
+    console.log(`  Watch DID:        ${config.avaast.watchDid}`);
+    console.log(`  Watch rkey:       ${config.avaast.watchRkey}`);
+    console.log(`  PDS endpoint:     ${config.avaast.pdsEndpoint ?? '(auto-resolve)'}`);
     console.log(`  Gateway port:     ${config.server.port}`);
     console.log(`  Controller port:  ${config.server.controllerPort}`);
     console.log(`  Hostname:         ${config.server.hostname ?? '(none)'}`);

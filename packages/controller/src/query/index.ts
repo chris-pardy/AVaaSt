@@ -6,4 +6,9 @@ export {
   type SourcePlan,
 } from "./planner.js";
 export { QueryCache } from "./cache.js";
-export { PdsDataSource, type DataSourceAdapter } from "./sources.js";
+export {
+  PdsDataSource,
+  ChangeLogDataSource,
+  RoutingDataSource,
+  type DataSourceAdapter,
+} from "./sources.js";

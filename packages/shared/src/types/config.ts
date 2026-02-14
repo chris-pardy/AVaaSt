@@ -1,10 +1,13 @@
 import { z } from "zod";
 
 export const configSchema = z.object({
-  avaas: z.object({
+  avaast: z.object({
     watchDid: z.string().startsWith("did:"),
     watchRkey: z.string().default("self"),
     pdsEndpoint: z.string().url().optional(),
+    nodeId: z.string().optional(),
+    appPassword: z.string().optional(),
+    heartbeatIntervalMs: z.number().int().min(1000).default(30000),
   }),
   server: z.object({
     port: z.number().int().min(1).max(65535).default(3000),

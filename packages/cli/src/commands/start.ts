@@ -9,7 +9,7 @@ export async function startCommand(config: Config, options: { logLevel?: string 
   }
 
   logger.info('Starting AVaaSt...');
-  logger.info(`Watching DID: ${config.avaas.watchDid}`);
+  logger.info(`Watching DID: ${config.avaast.watchDid}`);
   logger.info(`Gateway port: ${config.server.port}`);
   logger.info(`Controller port: ${config.server.controllerPort}`);
 

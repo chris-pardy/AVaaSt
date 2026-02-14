@@ -14,16 +14,27 @@ import { Watcher, type FirehoseEvent } from "./watcher/index.js";
 import { DeployOrchestrator } from "./deploy/orchestrator.js";
 import { refKey, type DependencyNode } from "./deploy/dependency-graph.js";
 import { QueryEngine } from "./query/engine.js";
-import { PdsDataSource } from "./query/sources.js";
+import { PdsDataSource, RoutingDataSource } from "./query/sources.js";
 import { ControllerServer, type QueryResolver } from "./server.js";
+import { ChangeLog } from "./changelog.js";
+import { PdsClient } from "./pds-client.js";
+import { Heartbeat } from "./heartbeat.js";
 
 export { Watcher, type FirehoseEvent } from "./watcher/index.js";
 export { JetstreamClient } from "./watcher/jetstream.js";
 export { PdsResolver } from "./watcher/pds-resolver.js";
 export { QueryEngine, type QueryEngineOptions } from "./query/engine.js";
-export { PdsDataSource, type DataSourceAdapter } from "./query/sources.js";
+export {
+  PdsDataSource,
+  ChangeLogDataSource,
+  RoutingDataSource,
+  type DataSourceAdapter,
+} from "./query/sources.js";
 export { DeployOrchestrator } from "./deploy/orchestrator.js";
 export { ControllerServer, type QueryResolver } from "./server.js";
+export { ChangeLog } from "./changelog.js";
+export { PdsClient } from "./pds-client.js";
+export { Heartbeat } from "./heartbeat.js";
 
 const logger = createLogger("controller");
 
@@ -35,15 +46,21 @@ export interface ControllerOptions {
   controllerPort?: number;
   gatewayUrl?: string;
   extraCollections?: string[];
+  /** Node ID for heartbeat. When set with appPassword, enables heartbeat. */
+  nodeId?: string;
+  /** App password for authenticated PDS writes (heartbeat). */
+  appPassword?: string;
+  /** Heartbeat interval in milliseconds (default: 30000). */
+  heartbeatIntervalMs?: number;
 }
 
 /**
  * Controller ties together Watcher → DeployOrchestrator → QueryEngine → Server.
  *
  * On event from Jetstream/Watcher:
- * - dev.avaas.computed create → store in computedRecords map
- * - dev.avaas.deploy create → fetch record, process deploy
- * - dev.avaas.appView create/update → extract deploy refs, process, register on gateway
+ * - app.avaast.computed create → store in computedRecords map
+ * - app.avaast.deploy create → fetch record, process deploy
+ * - app.avaast.appView create/update → extract deploy refs, process, register on gateway
  */
 export class Controller {
   private logger = createLogger("controller");
@@ -52,6 +69,9 @@ export class Controller {
   private queryEngine: QueryEngine;
   private server: ControllerServer;
   private options: ControllerOptions;
+  private changeLog: ChangeLog;
+  private pdsClient: PdsClient | null = null;
+  private heartbeat: Heartbeat | null = null;
 
   /** Stored computed records keyed by CID */
   private computedRecords = new Map<string, ComputedRecord>();
@@ -59,9 +79,17 @@ export class Controller {
   private currentTrafficRules: TrafficRule[] = [];
   /** Current app view endpoints */
   private currentEndpoints: DeployedEndpoint[] = [];
+  /** CIDs of app view records this node has observed, keyed by rkey */
+  private appViewCids = new Map<string, string>();
 
   constructor(options: ControllerOptions) {
     this.options = options;
+
+    // Initialize change log (always available, even without heartbeat)
+    const changeLogDbPath = options.dbPath
+      ? options.dbPath.replace(/\.db$/, "-changelog.db")
+      : ":memory:";
+    this.changeLog = new ChangeLog(changeLogDbPath);
 
     // Build the PDS data source for queries
     const pdsDataSource = new PdsDataSource({
@@ -77,8 +105,14 @@ export class Controller {
       },
     });
 
+    // Wire RoutingDataSource (wrapping PDS + ChangeLog) into QueryEngine
+    const routingDataSource = new RoutingDataSource(
+      pdsDataSource,
+      this.changeLog,
+    );
+
     this.queryEngine = new QueryEngine({
-      dataSource: pdsDataSource,
+      dataSource: routingDataSource,
       defaultDid: options.watchDid,
     });
 
@@ -127,12 +161,35 @@ export class Controller {
   async start(): Promise<void> {
     await this.server.start();
     await this.watcher.start();
+
+    // If appPassword provided: create PdsClient, authenticate, start Heartbeat
+    if (this.options.appPassword && this.options.nodeId) {
+      try {
+        this.pdsClient = new PdsClient(this.options.pdsEndpoint);
+        await this.pdsClient.createSession(
+          this.options.watchDid,
+          this.options.appPassword,
+        );
+        this.heartbeat = new Heartbeat({
+          nodeId: this.options.nodeId,
+          pdsClient: this.pdsClient,
+          intervalMs: this.options.heartbeatIntervalMs,
+          getAppViewCids: () => Array.from(this.appViewCids.values()),
+        });
+        await this.heartbeat.start();
+      } catch (err) {
+        this.logger.error("Failed to start heartbeat", err);
+      }
+    }
+
     this.logger.info("Controller started");
   }
 
   async stop(): Promise<void> {
+    this.heartbeat?.stop();
     this.watcher.stop();
     await this.server.stop();
+    this.changeLog.close();
     this.logger.info("Controller stopped");
   }
 
@@ -146,8 +203,11 @@ export class Controller {
       `Event: ${event.type} ${event.collection} ${event.rkey}`,
     );
 
+    // Feed all events into the change log
+    this.changeLog.append(event);
+
     switch (event.collection) {
-      case "dev.avaas.computed":
+      case "app.avaast.computed":
         if (event.type === "create" && event.record && event.cid) {
           this.computedRecords.set(
             event.cid,
@@ -157,7 +217,7 @@ export class Controller {
         }
         break;
 
-      case "dev.avaas.deploy":
+      case "app.avaast.deploy":
         if (event.type === "create" && event.record) {
           const deployRef: ResourceRef = {
             did: event.did,
@@ -170,7 +230,7 @@ export class Controller {
         }
         break;
 
-      case "dev.avaas.appView":
+      case "app.avaast.appView":
         if (
           (event.type === "create" || event.type === "update") &&
           event.record
@@ -181,8 +241,11 @@ export class Controller {
     }
   }
 
-  private async handleAppView(event: FirehoseEvent): void {
+  private async handleAppView(event: FirehoseEvent): Promise<void> {
     const appView = event.record as AppViewRecord;
+    if (event.cid) {
+      this.appViewCids.set(event.rkey, event.cid);
+    }
     const deployRefs = this.orchestrator.processAppView(appView);
 
     // Process any deploys we haven't seen
@@ -191,7 +254,7 @@ export class Controller {
       if (!status) {
         // Try to fetch the deploy record
         try {
-          const uri = `at://${ref.did}/dev.avaas.deploy/self`;
+          const uri = `at://${ref.did}/app.avaast.deploy/self`;
           this.logger.info(`Would fetch deploy for ref ${refKey(ref)}`);
         } catch (err) {
           this.logger.error(`Failed to fetch deploy for ${refKey(ref)}`, err);
