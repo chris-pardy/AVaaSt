@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "chat.pirate.aye",
+  "description": "An Aye reply to an Avast message.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A pirate Aye acknowledgement.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["avast", "createdAt"],
+        "properties": {
+          "avast": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

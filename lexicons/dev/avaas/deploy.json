@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "dev.avaas.deploy",
+  "description": "A deploy record that bundles a set of resource endpoints into a single versioned deployment unit.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A deployment containing versioned endpoint references.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["endpoints", "createdAt"],
+        "properties": {
+          "version": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "endpoints": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#deployedEndpoint"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "deployedEndpoint": {
+      "type": "object",
+      "description": "A single endpoint within a deployment, mapping an XRPC method name to a resource.",
+      "required": ["name", "kind", "ref"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "knownValues": ["computed", "function", "searchIndex", "subscription"]
+        },
+        "ref": {
+          "type": "ref",
+          "ref": "dev.avaas.defs#resourceRef"
+        }
+      }
+    }
+  }
+}

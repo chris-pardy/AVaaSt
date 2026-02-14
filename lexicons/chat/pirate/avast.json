@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "chat.pirate.avast",
+  "description": "An Avast message in the pirate chat app.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A pirate Avast shout.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["text", "createdAt"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "lexicon": 1,
+  "id": "dev.avaas.searchIndex",
+  "description": "A search index record that defines full-text and structured search over AT Protocol collection data.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A search index with indexed fields, parameters, and a typed output schema.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "source", "fields", "outputSchema", "createdAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "source": {
+            "type": "ref",
+            "ref": "dev.avaas.defs#source"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#indexedField"
+            }
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#searchParameter"
+            }
+          },
+          "outputSchema": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#outputField"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "indexedField": {
+      "type": "object",
+      "description": "A field to be indexed for search, with its index type and optional analysis settings.",
+      "required": ["name", "path", "indexType"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "indexType": {
+          "type": "string",
+          "knownValues": ["fulltext", "keyword", "numeric", "datetime", "geo"]
+        },
+        "analyzer": {
+          "type": "string",
+          "knownValues": ["standard", "simple", "whitespace", "language"]
+        },
+        "language": {
+          "type": "string",
+          "maxLength": 10
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      }
+    },
+    "searchParameter": {
+      "type": "object",
+      "description": "A parameter accepted by the search index endpoint.",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": ["query", "filter", "sort", "facet"]
+        },
+        "field": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

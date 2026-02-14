@@ -1,0 +1,481 @@
+{
+  "lexicon": 1,
+  "id": "dev.avaas.defs",
+  "description": "Shared type definitions for the AVaaS platform.",
+  "defs": {
+    "resourceRef": {
+      "type": "object",
+      "description": "A reference to a resource in another repository, identified by DID and CID.",
+      "required": ["did", "cid"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "cid": {
+          "type": "string"
+        }
+      }
+    },
+    "trafficRule": {
+      "type": "object",
+      "description": "A weighted traffic routing rule pointing to a specific deploy.",
+      "required": ["deploy", "weight"],
+      "properties": {
+        "deploy": {
+          "type": "ref",
+          "ref": "#resourceRef"
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      }
+    },
+    "fieldSchema": {
+      "type": "object",
+      "description": "Describes the schema of a single field value.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "string",
+            "integer",
+            "boolean",
+            "float",
+            "datetime",
+            "bytes",
+            "array",
+            "object",
+            "unknown"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "items": {
+          "type": "ref",
+          "ref": "#fieldSchema"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#namedFieldSchema"
+          }
+        }
+      }
+    },
+    "namedFieldSchema": {
+      "type": "object",
+      "description": "A named field with its schema and optionality.",
+      "required": ["name", "schema"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "ref",
+          "ref": "#fieldSchema"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "outputField": {
+      "type": "object",
+      "description": "Describes a field in the output of a computed view or function.",
+      "required": ["name", "schema"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "alias": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "ref",
+          "ref": "#fieldSchema"
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "description": "Declares a dependency on another resource used by function code.",
+      "required": ["name", "kind"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "knownValues": [
+            "computed",
+            "function",
+            "searchIndex",
+            "subscription",
+            "collection"
+          ]
+        },
+        "ref": {
+          "type": "ref",
+          "ref": "#resourceRef"
+        },
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        }
+      }
+    },
+    "fieldRef": {
+      "type": "object",
+      "description": "A reference to a field on a data source.",
+      "required": ["source", "field"],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        }
+      }
+    },
+    "literal": {
+      "type": "object",
+      "description": "A literal scalar value.",
+      "properties": {
+        "stringValue": {
+          "type": "string"
+        },
+        "integerValue": {
+          "type": "integer"
+        },
+        "booleanValue": {
+          "type": "boolean"
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "description": "A comparison between two expressions.",
+      "required": ["op", "left"],
+      "properties": {
+        "op": {
+          "type": "string",
+          "knownValues": [
+            "eq",
+            "neq",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "like",
+            "in",
+            "isNull",
+            "isNotNull",
+            "between",
+            "notIn"
+          ]
+        },
+        "left": {
+          "type": "ref",
+          "ref": "#expression"
+        },
+        "right": {
+          "type": "ref",
+          "ref": "#expression"
+        }
+      }
+    },
+    "logicalOp": {
+      "type": "object",
+      "description": "A logical operation combining multiple expressions.",
+      "required": ["op", "operands"],
+      "properties": {
+        "op": {
+          "type": "string",
+          "knownValues": ["and", "or", "not"]
+        },
+        "operands": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#expression"
+          }
+        }
+      }
+    },
+    "arithmeticOp": {
+      "type": "object",
+      "description": "An arithmetic operation between two expressions.",
+      "required": ["op", "left", "right"],
+      "properties": {
+        "op": {
+          "type": "string",
+          "knownValues": ["add", "subtract", "multiply", "divide", "modulo"]
+        },
+        "left": {
+          "type": "ref",
+          "ref": "#expression"
+        },
+        "right": {
+          "type": "ref",
+          "ref": "#expression"
+        }
+      }
+    },
+    "builtinCall": {
+      "type": "object",
+      "description": "A call to a built-in function.",
+      "required": ["name", "args"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "knownValues": [
+            "count",
+            "sum",
+            "avg",
+            "min",
+            "max",
+            "concat",
+            "lower",
+            "upper",
+            "trim",
+            "length",
+            "coalesce",
+            "now",
+            "substring",
+            "abs",
+            "round",
+            "floor",
+            "ceil"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#expression"
+          }
+        }
+      }
+    },
+    "functionCall": {
+      "type": "object",
+      "description": "A call to a user-defined function resource.",
+      "required": ["ref", "args"],
+      "properties": {
+        "ref": {
+          "type": "ref",
+          "ref": "#resourceRef"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#expression"
+          }
+        }
+      }
+    },
+    "caseBranch": {
+      "type": "object",
+      "description": "A single branch in a case expression.",
+      "required": ["when", "then"],
+      "properties": {
+        "when": {
+          "type": "ref",
+          "ref": "#expression"
+        },
+        "then": {
+          "type": "ref",
+          "ref": "#expression"
+        }
+      }
+    },
+    "caseExpression": {
+      "type": "object",
+      "description": "A case/when expression with multiple branches and an optional else.",
+      "required": ["branches"],
+      "properties": {
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#caseBranch"
+          }
+        },
+        "elseValue": {
+          "type": "ref",
+          "ref": "#expression"
+        }
+      }
+    },
+    "expression": {
+      "type": "union",
+      "description": "A query expression node. Can be a field reference, literal, comparison, logical operation, arithmetic operation, built-in call, function call, or case expression.",
+      "refs": [
+        "#fieldRef",
+        "#literal",
+        "#comparison",
+        "#logicalOp",
+        "#arithmeticOp",
+        "#builtinCall",
+        "#functionCall",
+        "#caseExpression"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "description": "A data source referenced in a query, identified by collection NSID and optional DID.",
+      "required": ["alias", "collection"],
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "selectField": {
+      "type": "object",
+      "description": "A field selected in a query, with an alias and value expression.",
+      "required": ["alias", "value"],
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "value": {
+          "type": "ref",
+          "ref": "#expression"
+        }
+      }
+    },
+    "joinClause": {
+      "type": "object",
+      "description": "A join clause linking an additional data source into a query.",
+      "required": ["joinType", "source", "on"],
+      "properties": {
+        "joinType": {
+          "type": "string",
+          "knownValues": ["inner", "left", "right", "cross"]
+        },
+        "source": {
+          "type": "ref",
+          "ref": "#source"
+        },
+        "on": {
+          "type": "ref",
+          "ref": "#expression"
+        }
+      }
+    },
+    "orderByClause": {
+      "type": "object",
+      "description": "An ordering directive for query results.",
+      "required": ["value", "direction"],
+      "properties": {
+        "value": {
+          "type": "ref",
+          "ref": "#expression"
+        },
+        "direction": {
+          "type": "string",
+          "knownValues": ["asc", "desc"]
+        },
+        "nulls": {
+          "type": "string",
+          "knownValues": ["first", "last"]
+        }
+      }
+    },
+    "query": {
+      "type": "object",
+      "description": "A declarative query over one or more AT Protocol collections.",
+      "required": ["select", "from"],
+      "properties": {
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#selectField"
+          }
+        },
+        "from": {
+          "type": "ref",
+          "ref": "#source"
+        },
+        "joins": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#joinClause"
+          }
+        },
+        "where": {
+          "type": "ref",
+          "ref": "#expression"
+        },
+        "groupBy": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#expression"
+          }
+        },
+        "having": {
+          "type": "ref",
+          "ref": "#expression"
+        },
+        "orderBy": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#orderByClause"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distinct": {
+          "type": "boolean"
+        }
+      }
+    },
+    "queryParameter": {
+      "type": "object",
+      "description": "A parameterized input to a query or subscription.",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": ["string", "integer", "boolean", "float"]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "defaultValue": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

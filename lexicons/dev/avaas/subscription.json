@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "dev.avaas.subscription",
+  "description": "A reactive subscription record that watches a data source and emits matching records in real time.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A subscription that watches a collection source with optional filtering and field selection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "source", "fields", "outputSchema", "createdAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "source": {
+            "type": "ref",
+            "ref": "dev.avaas.defs#source"
+          },
+          "filter": {
+            "type": "ref",
+            "ref": "dev.avaas.defs#expression"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#selectField"
+            }
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#queryParameter"
+            }
+          },
+          "outputSchema": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#outputField"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

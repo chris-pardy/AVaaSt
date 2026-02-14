@@ -1,0 +1,88 @@
+services:
+  # ---- Local AT Protocol infrastructure ----
+
+  pds:
+    image: ghcr.io/bluesky-social/pds:0.4
+    ports:
+      - "2583:2583"
+    environment:
+      - PDS_HOSTNAME=${PDS_HOSTNAME:-localhost}
+      - PDS_PORT=2583
+      - PDS_JWT_SECRET=${PDS_JWT_SECRET:-devjwtsecret-unsafe-do-not-use-in-prod}
+      - PDS_ADMIN_PASSWORD=${PDS_ADMIN_PASSWORD:-admin}
+      - PDS_DATA_DIRECTORY=/pds
+      - PDS_DID_PLC_URL=https://plc.directory
+      - PDS_BSKY_APP_VIEW_URL=https://api.bsky.app
+      - PDS_BSKY_APP_VIEW_DID=did:web:api.bsky.app
+      - PDS_REPORT_SERVICE_URL=https://mod.bsky.app
+      - PDS_REPORT_SERVICE_DID=did:plc:ar7c4by46qjdydhdevvrndac
+      - PDS_BLOBSTORE_DISK_LOCATION=/pds/blobs
+      - PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX=${PDS_PLC_ROTATION_KEY:-2f9c54c7ff855a2982a663d6c6800165ab0e60e10f2ecca2a1a7509d8ca594e5}
+      - PDS_DEV_MODE=true
+      - PDS_INVITE_REQUIRED=false
+      - LOG_ENABLED=true
+      - LOG_LEVEL=info
+    volumes:
+      - pds-data:/pds
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:2583/xrpc/_health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  jetstream:
+    image: ghcr.io/bluesky-social/jetstream:sha-05c89f0
+    ports:
+      - "6008:6008"
+      - "6009:6009"
+    environment:
+      - JETSTREAM_WS_URL=ws://pds:2583/xrpc/com.atproto.sync.subscribeRepos
+      - JETSTREAM_LISTEN_ADDR=:6008
+      - JETSTREAM_METRICS_LISTEN_ADDR=:6009
+      - JETSTREAM_DATA_DIR=/data
+    volumes:
+      - jetstream-data:/data
+    depends_on:
+      pds:
+        condition: service_healthy
+
+  # ---- AVaaSt services ----
+
+  gateway:
+    build:
+      context: .
+      dockerfile: packages/gateway/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - AVAAS_CONTROLLER_URL=http://controller:3001
+    depends_on:
+      - controller
+
+  controller:
+    build:
+      context: .
+      dockerfile: packages/controller/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - AVAAS_WATCH_DID=${AVAAS_WATCH_DID}
+      - AVAAS_PDS_ENDPOINT=http://pds:2583
+      - AVAAS_JETSTREAM_URL=ws://jetstream:6008/subscribe
+    volumes:
+      - avaas-data:/data
+    depends_on:
+      - deno-runtime
+      - pds
+      - jetstream
+
+  deno-runtime:
+    image: denoland/deno:latest
+    volumes:
+      - avaas-functions:/functions
+
+volumes:
+  avaas-data:
+  avaas-functions:
+  pds-data:
+  jetstream-data:

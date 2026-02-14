@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "dev.avaas.appView",
+  "description": "An app view record that represents a running service endpoint with traffic routing across deployments.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An app view with traffic rules for weighted routing across deploys.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "trafficRules", "status", "createdAt", "updatedAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "hostname": {
+            "type": "string",
+            "maxLength": 253
+          },
+          "trafficRules": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#trafficRule"
+            }
+          },
+          "status": {
+            "type": "string",
+            "knownValues": ["active", "paused", "draining"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "dev.avaas.computed",
+  "description": "A computed view record that defines a declarative query over AT Protocol collections with a typed output schema.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A computed view defined by a declarative query.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "query", "outputSchema", "createdAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "query": {
+            "type": "ref",
+            "ref": "dev.avaas.defs#query"
+          },
+          "outputSchema": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#outputField"
+            }
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "dev.avaas.defs#queryParameter"
+            }
+          },
+          "cacheTtl": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 86400
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}
