@@ -105,7 +105,7 @@ describe("Pirate App E2E", () => {
       "password123",
     );
 
-    // 2. Start Controller (connects to Jetstream, watches for dev.avaas.* records)
+    // 2. Start Controller (connects to Jetstream, watches for app.avaast.* records)
     controller = new Controller({
       pdsEndpoint: PDS_URL,
       watchDid: account.did,
@@ -125,14 +125,14 @@ describe("Pirate App E2E", () => {
     // Small delay to let Jetstream connection establish
     await new Promise((r) => setTimeout(r, 1000));
 
-    // 4. Write AVaaSt records to PDS — Jetstream delivers events → Controller
+    // 4. Write AVaaSt records to PDS — Jetstream delivers events -> Controller
 
-    // 4a. dev.avaas.computed — the pirate query definition
+    // 4a. app.avaast.computed — the pirate query definition
     const computedRef = await createRecord(
       PDS_URL,
       account.accessJwt,
       account.did,
-      "dev.avaas.computed",
+      "app.avaast.computed",
       {
         name: "chat.pirate.getAvasts",
         query: PIRATE_QUERY,
@@ -146,12 +146,12 @@ describe("Pirate App E2E", () => {
       },
     );
 
-    // 4b. dev.avaas.deploy — endpoint mapping
+    // 4b. app.avaast.deploy — endpoint mapping
     const deployRef = await createRecord(
       PDS_URL,
       account.accessJwt,
       account.did,
-      "dev.avaas.deploy",
+      "app.avaast.deploy",
       {
         endpoints: [
           {
@@ -164,12 +164,12 @@ describe("Pirate App E2E", () => {
       },
     );
 
-    // 4c. dev.avaas.appView — traffic rules
+    // 4c. app.avaast.appView — traffic rules
     await createRecord(
       PDS_URL,
       account.accessJwt,
       account.did,
-      "dev.avaas.appView",
+      "app.avaast.appView",
       {
         name: "pirate-app",
         trafficRules: [

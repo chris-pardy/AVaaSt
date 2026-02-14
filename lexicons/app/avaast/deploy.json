@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.deploy",
+  "id": "app.avaast.deploy",
   "description": "A deploy record that bundles a set of resource endpoints into a single versioned deployment unit.",
   "defs": {
     "main": {
@@ -47,7 +47,7 @@
         },
         "ref": {
           "type": "ref",
-          "ref": "dev.avaas.defs#resourceRef"
+          "ref": "app.avaast.defs#resourceRef"
         }
       }
     }

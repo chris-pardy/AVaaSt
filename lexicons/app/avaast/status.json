@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "app.avaast.status",
+  "description": "A status/heartbeat record written by a controller node to indicate liveness and current state.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A status record updated in place via putRecord with rkey = nodeId.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["nodeId", "nextHeartbeatAt", "createdAt"],
+        "properties": {
+          "nodeId": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "nextHeartbeatAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "When this controller node started."
+          },
+          "version": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Software version of the controller."
+          },
+          "appViewCids": {
+            "type": "array",
+            "description": "CIDs of the app view records this node has observed. Nodes reaching agreement will report the same set.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

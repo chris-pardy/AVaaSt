@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.defs",
-  "description": "Shared type definitions for the AVaaS platform.",
+  "id": "app.avaast.defs",
+  "description": "Shared type definitions for the AVaaSt platform.",
   "defs": {
     "resourceRef": {
       "type": "object",

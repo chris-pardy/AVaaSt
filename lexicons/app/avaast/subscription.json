@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.subscription",
+  "id": "app.avaast.subscription",
   "description": "A reactive subscription record that watches a data source and emits matching records in real time.",
   "defs": {
     "main": {
@@ -21,31 +21,31 @@
           },
           "source": {
             "type": "ref",
-            "ref": "dev.avaas.defs#source"
+            "ref": "app.avaast.defs#source"
           },
           "filter": {
             "type": "ref",
-            "ref": "dev.avaas.defs#expression"
+            "ref": "app.avaast.defs#expression"
           },
           "fields": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#selectField"
+              "ref": "app.avaast.defs#selectField"
             }
           },
           "parameters": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#queryParameter"
+              "ref": "app.avaast.defs#queryParameter"
             }
           },
           "outputSchema": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#outputField"
+              "ref": "app.avaast.defs#outputField"
             }
           },
           "createdAt": {

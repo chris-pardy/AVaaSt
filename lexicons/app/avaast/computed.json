@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.avaas.computed",
+  "id": "app.avaast.computed",
   "description": "A computed view record that defines a declarative query over AT Protocol collections with a typed output schema.",
   "defs": {
     "main": {
@@ -21,20 +21,20 @@
           },
           "query": {
             "type": "ref",
-            "ref": "dev.avaas.defs#query"
+            "ref": "app.avaast.defs#query"
           },
           "outputSchema": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#outputField"
+              "ref": "app.avaast.defs#outputField"
             }
           },
           "parameters": {
             "type": "array",
             "items": {
               "type": "ref",
-              "ref": "dev.avaas.defs#queryParameter"
+              "ref": "app.avaast.defs#queryParameter"
             }
           },
           "cacheTtl": {
